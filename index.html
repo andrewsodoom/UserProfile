@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyProfile</title>
+    <style>
+        body {
+            font-size: 20px;
+            margin-left: 120px;
+        }
+
+        .editProfile {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Profile</h1>
+        
+        <img id="image" src="images/profile-1.jpg" alt="myPhoto" style="width: 380px; height: 370px; padding-bottom: 15px;">
+        <p>Name: <span class="name"><b>Andrews Odoom</b></span></p>
+        <hr />
+        Email: <span class="email"><b>andrewsodoom679@gmail.com</b></span>
+        <hr />
+        Interest: <span class="interest"><b>Coding</b></span>
+        <hr />
+        <button onclick="editProfile()" class="editBtn" style="padding:10px 15px 10px 15px; border-color: rgb(214, 213, 213); border-radius: 10px;">Edit Profile</button>
+    </div>
+
+    <div class="editProfile">
+        <h1>User Profile</h1>
+        <img id="image" src="images/profile-1.jpg" alt="myPhoto" style="width: 380px; height: 380px; padding-bottom: 15px;">
+        <p>Name: <input class="input-name" type="text"></p>
+        <hr />
+        Email: <input class="email-input" type="email">
+        <hr />
+        Interest: <input class="interest-input" type="text">
+        <hr />
+        <button onclick="saveProfile()" class="editBtn" style="padding:10px 15px 10px 15px; border-color: rgb(214, 213, 213); border-radius: 10px;">Save Profile</button>
+    </div>
+</body>
+<script>
+    function renderProfile(profile) {
+        const name = profile.name || 'Andrews Odoom';
+        const email = profile.email || 'andrewsodoom679@gmail.com';
+        const interest = profile.interest || 'Coding';
+
+        document.querySelector('.name').textContent = name;
+        document.querySelector('.email').textContent = email;
+        document.querySelector('.interest').textContent = interest;
+    }
+
+    async function loadProfile() {
+        const response = await fetch('/get-profile');
+        const profile = await response.json();
+        renderProfile(profile);
+    }
+
+    function editProfile() {
+        document.querySelector('.container').style.display = 'none';
+        document.querySelector('.editProfile').style.display = 'block';
+
+        const name = document.querySelector('.name').textContent;
+        document.querySelector('.input-name').value = name;
+
+        const email = document.querySelector('.email').textContent;
+        document.querySelector('.email-input').value = email;
+
+        const interest = document.querySelector('.interest').textContent;
+        document.querySelector('.interest-input').value = interest;
+    }
+
+    async function saveProfile() {
+        const payload = {
+            name: document.querySelector('.input-name').value,
+            email: document.querySelector('.email-input').value,
+            interest: document.querySelector('.interest-input').value
+        };
+
+        const response = await fetch('/update-profile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const savedProfile = await response.json();
+        renderProfile(savedProfile);
+
+        document.querySelector('.container').style.display = 'block';
+        document.querySelector('.editProfile').style.display = 'none';
+    }
+
+    window.addEventListener('DOMContentLoaded', loadProfile);
+</script>
+</html>
